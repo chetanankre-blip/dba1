@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Dolphin Badminton ELITE</title>
+<link rel="stylesheet" href="styles.css"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+
+<script>
+  // v10 Ultra-stable: remove any old service worker caches from previous versions
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      regs.forEach(function(r){ r.unregister(); });
+    });
+  }
+</script>
+
+</head>
+<body>
+<header class="top">
+  <div class="brand">Dolphin Badminton <span>ELITE</span></div>
+  <nav class="tabs">
+    <button data-tab="entries" class="active">Entries</button>
+    <button data-tab="draw">Draw</button>
+    <button data-tab="schedule">Schedule</button>
+    <button data-tab="controller">Controller</button>
+    <button data-tab="display">Display</button>
+    <button data-tab="settings">Settings</button>
+  </nav>
+</header>
+
+<main>
+<section id="entries" class="tab active">
+  <h2>Entries</h2>
+  <div class="hint">
+    Paste lines from Excel/Sheets (comma or tab). Any order works.<br/>
+    Examples: <code>Senior, chetan, S</code> or <code>Senior, S, chetan</code> or <code>S, Senior, chetan</code><br/>
+    Doubles: <code>Senior, D, Ajay, Vijay</code> (optional: seed, academy)
+  </div>
+
+  <textarea id="pasteBox" placeholder="Senior,chetan,S&#10;Senior,S,abhishek"></textarea>
+  <div class="row">
+    <button id="btnImportLocal">Import to Local</button>
+    <button id="btnClearEntries" class="ghost">Clear</button>
+    <div class="stat" id="statEntries">0 entries</div>
+  </div>
+
+  <h3>Manual Add</h3>
+  <div class="grid2">
+    <div>
+      <label>Category</label>
+      <input id="manCategory" placeholder="e.g., Senior"/>
+    </div>
+    <div>
+      <label>Type</label>
+      <select id="manType">
+        <option value="S">Singles</option>
+        <option value="D">Doubles</option>
+      </select>
+    </div>
+    <div>
+      <label>Name 1</label>
+      <input id="manName1" placeholder="Player 1"/>
+    </div>
+    <div>
+      <label>Name 2 (only doubles)</label>
+      <input id="manName2" placeholder="Partner"/>
+    </div>
+    <div>
+      <label>Seed (optional)</label>
+      <input id="manSeed" placeholder="1"/>
+    </div>
+    <div>
+      <label>Academy/Team (optional)</label>
+      <input id="manAcademy" placeholder="Dolphin"/>
+    </div>
+  </div>
+  <div class="row">
+    <button id="btnManualAdd">Add</button>
+  </div>
+
+  <h3>Local Entries</h3>
+  <div class="tableWrap">
+    <table id="tblEntries">
+      <thead>
+        <tr><th>#</th><th>Category</th><th>Type</th><th>Name 1</th><th>Name 2</th><th>Seed</th><th>Academy</th><th></th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</section>
+
+<section id="draw" class="tab">
+  <h2>Draw</h2>
+  <div class="grid3">
+    <div>
+      <label>Category</label>
+      <select id="drawCategory"></select>
+    </div>
+    <div>
+      <label>Format</label>
+      <select id="drawFormat">
+        <option value="KO">Knockout</option>
+        <option value="RR">Round Robin</option>
+      </select>
+    </div>
+    <div>
+      <label>Protected teams (comma) - optional</label>
+      <input id="protectedTeams" placeholder="Rewa,Sagar,Gwalior,Ujjain"/>
+    </div>
+  </div>
+  <div class="row">
+    <button id="btnGenerateDraw">Generate</button>
+    <button id="btnPrintBracket" class="ghost">Print Bracket</button>
+    <button id="btnSaveMatches" class="ghost">Save matches → Schedule</button>
+    <div class="stat" id="statMatches">0 matches</div>
+  </div>
+  <div class="split">
+    <div>
+      <h3>Draw Output</h3>
+      <div id="drawOutput" class="panel"></div>
+      <div class="panel bracketWrap" id="bracketOutput" style="margin-top:10px"></div>
+    </div>
+    <div>
+      <h3>Matches</h3>
+      <div id="matchesOutput" class="panel"></div>
+    </div>
+  </div>
+</section>
+
+<section id="schedule" class="tab">
+  <h2>Schedule</h2>
+  <div class="hint">First generate matches in <b>Draw</b> and click <b>Save matches → Schedule</b>.</div>
+
+  <div class="grid3">
+    <div>
+      <label>Match duration (minutes)</label>
+      <input id="schDuration" type="number" value="45"/>
+    </div>
+    <div>
+      <label>Gap (minutes)</label>
+      <input id="schGap" type="number" value="5"/>
+    </div>
+    <div>
+      <label>Courts (comma names)</label>
+      <input id="schCourts" value="Court-1,Court-2,Court-3,Court-4"/>
+    </div>
+    <div>
+      <label>Venue / Location (optional)</label>
+      <input id="schVenue" placeholder="e.g., Dolphin Badminton Academy"/>
+    </div>
+    <div>
+      <label>Session 1 (start-end)</label>
+      <input id="schS1" value="10:00-13:00"/>
+    </div>
+    <div>
+      <label>Session 2 (start-end)</label>
+      <input id="schS2" value="15:00-21:00"/>
+    </div>
+    <div>
+      <label>Start date (YYYY-MM-DD)</label>
+      <input id="schDate" placeholder="2026-02-14"/>
+    </div>
+  </div>
+
+  <div class="row">
+    <button id="btnGenerateSchedule">Generate Schedule</button>
+    <button id="btnClearSchedule" class="ghost">Clear schedule</button>
+    <div class="stat" id="statSchedule">0 scheduled</div>
+  </div>
+
+  <div class="panel" id="scheduleOutput"></div>
+</section>
+
+<section id="controller" class="tab">
+  <h2>Controller</h2>
+  <div class="grid2">
+    <div>
+      <label>Match</label>
+      <select id="ctlMatch"></select>
+    </div>
+    <div>
+      <label>Scan/Share display</label>
+      <div class="row">
+        <button id="btnCtlQR" class="ghost">Show QR</button>
+        <span class="muted" id="ctlLink"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="scoreboard">
+    <div class="team">
+      <div class="name" id="p1Name">Player 1</div>
+      <div class="score" id="p1Score">0</div>
+      <div class="row">
+        <button data-side="1" data-delta="1">+1</button>
+        <button data-side="1" data-delta="-1" class="ghost">-1</button>
+      </div>
+    </div>
+    <div class="team">
+      <div class="name" id="p2Name">Player 2</div>
+      <div class="score" id="p2Score">0</div>
+      <div class="row">
+        <button data-side="2" data-delta="1">+1</button>
+        <button data-side="2" data-delta="-1" class="ghost">-1</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <button id="btnSwap" class="ghost">Swap</button>
+    <button id="btnResetScore" class="ghost">Reset</button>
+  </div>
+
+  <div class="panel">
+    <div id="qrBox"></div>
+  </div>
+</section>
+
+<section id="display" class="tab">
+  <h2>Big Display</h2>
+  <div class="hint">Open on TV/Laptop: <code>display.html?m=ID</code> (use Controller → QR).</div>
+  <div class="row">
+    <a class="btn" id="btnOpenDisplay" target="_blank" rel="noopener">Open Display</a>
+    <button id="btnDispQR" class="ghost">Show QR</button>
+  </div>
+  <div class="panel"><div id="dispQR"></div></div>
+</section>
+
+<section id="settings" class="tab">
+  <h2>Settings</h2>
+  <div class="hint">Offline-first. Data stored in your browser (LocalStorage). For Sheets import use “Publish to web → CSV”.</div>
+  <div class="row">
+    <button id="btnExportJSON">Export Backup</button>
+    <input id="fileImportJSON" type="file" accept="application/json"/>
+    <button id="btnImportJSON" class="ghost">Import Backup</button>
+  </div>
+</section>
+</main>
+
+<script src="qrcode.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

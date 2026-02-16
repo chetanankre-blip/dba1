@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Dolphin ELITE Display</title>
+<link rel="stylesheet" href="styles.css"/>
+<style>
+body{padding:14px}
+.big{max-width:1100px;margin:0 auto}
+.hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.tag{color:#bdbdc7}
+.big .scoreboard .score{font-size:110px}
+.big .name{font-size:26px}
+</style>
+</head>
+<body>
+<div class="big">
+  <div class="hdr">
+    <div class="brand">Dolphin Badminton <span>ELITE</span></div>
+    <div class="tag" id="matchTag">Match</div>
+  </div>
+  <div class="scoreboard">
+    <div class="team">
+      <div class="name" id="dP1">Player 1</div>
+      <div class="score" id="dS1">0</div>
+    </div>
+    <div class="team">
+      <div class="name" id="dP2">Player 2</div>
+      <div class="score" id="dS2">0</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  function getParam(name){
+    var m=location.search.match(new RegExp("[?&]"+name+"=([^&]+)"));
+    return m?decodeURIComponent(m[1]):"";
+  }
+  var mid=getParam("m")||"";
+  document.getElementById("matchTag").textContent = mid?("Match: "+mid):"Match";
+
+  function load(){
+    try{
+      var all=JSON.parse(localStorage.getItem("dolphin_state")||"{}");
+      var match=(all.scores && all.scores[mid]) ? all.scores[mid] : null;
+      if(match){
+        document.getElementById("dP1").textContent = match.p1||"Player 1";
+        document.getElementById("dP2").textContent = match.p2||"Player 2";
+        document.getElementById("dS1").textContent = match.s1||0;
+        document.getElementById("dS2").textContent = match.s2||0;
+      }
+    }catch(e){}
+  }
+  window.addEventListener("storage", load);
+  setInterval(load, 700);
+  load();
+})();
+</script>
+</body>
+</html>
